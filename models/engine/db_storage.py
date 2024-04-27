@@ -82,3 +82,17 @@ class DBStorage:
         """ calls remove()
         """
         self.__session.close()
+    
+    def get(self, cls, id):
+        """Retrieve one object from the database"""
+        return self.__session.query(cls).get(id)
+
+    def count(self, cls=None):
+        """Count the number of objects in the database"""
+        if cls:
+            return self.__session.query(cls).count()
+        else:
+            total_count = 0
+            for model_class in [State, City, User, Place, Review, Amenity]:
+                total_count += self.__session.query(model_class).count()
+            return total_count
