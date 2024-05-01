@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""app"""
+"""Flask app"""
 from flask import Flask, make_response, jsonify
 from models import storage
 from api.v1.views import app_views
@@ -25,6 +25,7 @@ def tear(self):
 def not_found(error):
     ''' handles 404 error and gives json formatted response '''
     return make_response(jsonify({'error': 'Not found'}), 404)
+
 
 if __name__ == '__main__':
     if getenv("HBNB_API_HOST") is None:
