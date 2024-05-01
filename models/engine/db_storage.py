@@ -84,15 +84,44 @@ class DBStorage:
         self.__session.close()
     
     def get(self, cls, id):
-        """Retrieve one object from the database"""
-        return self.__session.query(cls).get(id)
+        """
+        Retrieves one object based on its class and ID.
+
+        Args:
+            cls: The class of the object to retrieve.
+            id: The string representing the object ID.
+
+        Returns:
+            The object based on the class and ID, or None if not found.
+        """
+        try:
+            data = self.db.get(f"{cls.__name__}_{id}")
+            if data:
+                return cls.deserialize(data)
+            else:
+                return None
+        except Exception as e:
+            self.logger.error(f"Error retrieving object: {e}")
+            return None
 
     def count(self, cls=None):
-        """Count the number of objects in the database"""
+        """
+        Counts the number of objects in storage for a specific class or all classes.
+
+        Args:
+            cls: The class to count objects for (optional).
+
+        Returns:
+            The number of objects in storage matching the given class.
+            If no class is passed, returns the count of all objects in storage.
+        """
         if cls:
-            return self.__session.query(cls).count()
+            return len(
+                [
+                    key
+                    for key in self.db.keys()
+                    if key.startswith(f"{cls.__name__}_")
+                ]
+            )
         else:
-            total_count = 0
-            for model_class in [State, City, User, Place, Review, Amenity]:
-                total_count += self.__session.query(model_class).count()
-            return total_count
+            return len(self.db.keys())

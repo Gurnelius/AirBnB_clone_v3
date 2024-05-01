@@ -79,17 +79,45 @@ class FileStorage:
         """
         self.reload()
     
+
     def get(self, cls, id):
-        """Retrieve one object from the JSON file"""
-        objects = self.all(cls)
-        key = "{}.{}".format(cls.__name__, id)
-        return objects.get(key)
+        """
+        Retrieves one object based on its class and ID.
+
+        Args:
+            cls: The class of the object to retrieve.
+            id: The string representing the object ID.
+
+        Returns:
+            The object based on the class and ID, or None if not found.
+        """
+        filename = f"{self.data_dir}/{cls.__name__}_{id}.json"
+        try:
+            with open(filename, "r") as f:
+                data = f.read()
+                return cls.deserialize(data)
+        except FileNotFoundError:
+            return None
+        except Exception as e:
+            self.logger.error(f"Error retrieving object: {e}")
+            return None
 
     def count(self, cls=None):
-        """Count the number of objects in the JSON file"""
+        """
+        Counts the number of objects in storage for a specific class or all classes.
+
+        Args:
+            cls: The class to count objects for (optional).
+
+        Returns:
+            The number of objects in storage matching the given class.
+            If no class is passed, returns the count of all objects in storage.
+        """
         if cls:
-            objects = self.all(cls)
-            return len(objects)
+            return sum(
+                1
+                for filename in self.list_files()
+                if filename.startswith(f"{cls.__name__}_")
+            )
         else:
-            return len(self.__objects)
-    
+            return len(self.list_files())

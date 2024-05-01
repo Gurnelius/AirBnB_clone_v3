@@ -107,3 +107,46 @@ class test_fileStorage(unittest.TestCase):
         from models.engine.file_storage import FileStorage
         print(type(storage))
         self.assertEqual(type(storage), FileStorage)
+
+    def test_get_existing_object(self):
+        class TestClass:
+            pass
+
+        obj = TestClass()
+        obj_id = "test_id"
+        self.storage.set(TestClass, obj_id, obj)
+        retrieved_obj = self.storage.get(TestClass, obj_id)
+        self.assertEqual(obj, retrieved_obj)
+
+    def test_get_nonexistent_object(self):
+        class TestClass:
+            pass
+
+        obj_id = "nonexistent_id"
+        retrieved_obj = self.storage.get(TestClass, obj_id)
+        self.assertIsNone(retrieved_obj)
+
+    def test_count_all_objects(self):
+        with open("TestClass1_id1.json", "w") as f:
+            f.write("{}")
+        with open("TestClass2_id2.json", "w") as f:
+            f.write("{}")
+        count = self.storage.count()
+        self.assertEqual(2, count)
+
+    def test_count_specific_class(self):
+        class TestClass:
+            pass
+
+        with open("TestClass1_id1.json", "w") as f:
+            f.write("{}")
+        with open(f"{TestClass.__name__}_id2.json", "w") as f:
+            f.write("{}")
+        with open("TestClass1_id3.json", "w") as f:
+            f.write("{}")
+        count = self.storage.count(TestClass)
+        self.assertEqual(1, count)
+
+    def tearDown(self):
+        for filename in self.storage.list_files():
+            os.remove(filename)

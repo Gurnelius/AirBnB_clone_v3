@@ -128,3 +128,50 @@ class TestFileStorage(unittest.TestCase):
     @unittest.skipIf(storage_t != 'db', "not testing db storage")
     def test_save(self):
         """Test that save properly saves objects to file.json"""
+
+
+class TestDBStorage(unittest.TestCase):
+    """Test the DBStorage class"""
+    @unittest.skipIf(storage_t != 'db', "not testing db storage")
+    def test_all_returns_dict(self):
+        """Test that all returns a dictionaty"""
+        self.assertIs(type(models.storage.all()), dict)
+
+    @unittest.skipIf(storage_t != 'db', "not testing db storage")
+    def test_all_no_class(self):
+        """Test that all returns all rows when no class is passed"""
+
+    @unittest.skipIf(storage_t != 'db', "not testing db storage")
+    def test_new(self):
+        """test that new adds an object to the database"""
+
+    @unittest.skipIf(storage_t != 'db', "not testing db storage")
+    def test_save(self):
+        """Test that save properly saves objects to file.json"""
+
+    def test_dbstorage_get():
+        # Setup DBStorage and populate the database with test data
+        db_storage = DBStorage()
+        db_storage.reload()
+
+        # Test retrieving an existing object
+        state = db_storage.get(State, "state_id")
+        assert state is not None
+
+        # Test retrieving a non-existing object
+        non_existing_state = db_storage.get(State, "non_existing_id")
+        assert non_existing_state is None
+
+    def test_dbstorage_count():
+        # Setup DBStorage and populate the database with test data
+        db_storage = DBStorage()
+        db_storage.reload()
+
+        # Test counting objects for a specific class
+        state_count = db_storage.count(State)
+        assert state_count == 3  # Assuming there are 3 states in the test data
+
+        # Test counting all objects
+        total_count = db_storage.count()
+        assert total_count == 10  # Assuming there are 10 objects in total in the test data
+
